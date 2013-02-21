@@ -1,0 +1,63 @@
+body {
+	background-image: url("../img/gradient_squares.png");
+	background-repeat: repeat;
+	background-size: auto auto;
+}
+
+h1, h2, h3 {
+	font-family: 'Lobster', cursive;	
+	text-shadow: 0 1px 0 #fff;
+}
+
+h1 {
+	font-size: 6em;
+	line-height: 100px;
+}
+
+h3 {
+	font-size: 1.7em;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 800px;
+}
+
+.logos {
+	width: 45%;
+}
+
+.main-title-container {
+	display: -webkit-box;
+	-webkit-box-align: center;
+	-webkit-box-orient: horizontal;
+  	-webkit-box-pack: center;
+	text-align: center;
+	padding: 25px;
+}
+
+.main-title-container .main-title {
+	-webkit-box-flex: 1;
+}
+
+.main-title-container img {
+	/* width: 11em; */
+	padding: 20px 0px;
+}
+
+.topics-title, .speaker-title {
+	padding: 10px 20px;
+}
+
+.topics {
+	display: -webkit-box;
+}
+
+.topic {
+	display: block;
+	background-color: #AAA;
+	-webkit-box-flex: 1;
+	border-radius: 15px;
+	padding: 10px;
+	margin: 0px 10px;
+}
