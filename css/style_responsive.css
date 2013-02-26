@@ -68,6 +68,7 @@ h3 {
 .topic {
 	background-color: #AAA;
 	border-radius: 15px;
+	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 10px;
 	min-height: 270px;
@@ -84,8 +85,9 @@ h3 {
 }
 
 .speaker-photo img {
-	border: solid 5px white;
+	border: 5px solid white;
 	border-radius: 15px;
+	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 /* #Media Queries
@@ -155,6 +157,7 @@ h3 {
 		.topic {
 			min-height: 100px;
 			margin-bottom: 20px !important;
+			text-align: center;
 		}
 		.speaker-photo img{
 			margin-left: 17px;
