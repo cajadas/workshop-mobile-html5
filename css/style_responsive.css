@@ -1,0 +1,163 @@
+body {
+	background-image: url("../img/gradient_squares.png");
+	background-repeat: repeat;
+	background-size: auto auto;
+}
+
+h1, h2, h3 {
+	font-family: 'Lobster', cursive;	
+	text-shadow: 0 1px 0 #fff;
+}
+
+h1 {
+	font-size: 6em;
+	line-height: 100px;
+}
+
+h3 {
+	font-size: 1.7em;
+}
+
+.lead {
+	text-align: justify;
+	margin-bottom: 0;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 960px;
+	padding: 0;
+	
+}
+
+.logos {
+	width: 45%;
+}
+
+.main-title-container {
+	text-align: center;
+	padding: 25px;
+}
+
+.main-title-container .main-title {
+	position: relative;	
+}
+.main-title-container .main-title h1 {
+	position: absolute;
+	top: 25%;
+}
+.main-title-container .main-title,
+.main-title-container .logos {
+	height: 500px;
+}
+
+.main-title-container img {
+	/* width: 11em; */
+	padding: 20px 0px;
+	float: right;
+}
+
+.topics-title, .speaker-title {
+	padding: 10px 0 10px;
+}
+
+.topics {
+
+}
+
+.topic {
+	background-color: #AAA;
+	border-radius: 15px;
+	box-sizing: border-box;
+	padding: 10px;
+	min-height: 270px;
+}
+
+.speaker {
+	overflow: hidden;
+	clear: both;
+	margin-bottom: 40px;
+}
+
+.speaker-bio {
+	text-align: justify;
+}
+
+.speaker-photo img {
+	border: solid 5px white;
+	border-radius: 15px;
+	box-sizing: border-box;
+}
+/* #Media Queries
+================================================== */
+	@media only screen and (max-width: 1920px){
+
+	}
+
+	/* Smaller than standard 960 (devices and browsers) */
+	@media only screen and (max-width: 959px) {
+		.topic {
+			min-height: 350px;
+		}
+		.main-title-container .main-title, 
+		.main-title-container .logos {
+			height: 404px;
+		}
+	}
+
+	/* Tablet Portrait size to standard 960 (devices and browsers) */
+	@media only screen and (min-width: 768px) and (max-width: 959px) {
+
+	}
+
+	/* All Mobile Sizes (devices and browser) */
+	@media only screen and (max-width: 767px) {
+
+	}
+
+	 /*Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+	@media only screen and (min-width: 480px) and (max-width: 767px) {
+		.main-title-container img {
+			float: none;
+		}
+		.main-title-container .main-title {
+			height: auto;
+		}	
+		.main-title-container .logos {
+			height: 460px;
+		}	
+		.main-title-container .main-title h1 {
+			position: relative;
+			top: auto;
+		}
+		.topic {
+			min-height: 100px;
+			margin-bottom: 20px !important;
+		}
+		.speaker-photo img{
+			margin-left: 77px;
+			margin-bottom: 20px;
+		}
+	}
+	 /*Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+	@media only screen and (max-width: 479px) {
+		.main-title-container .main-title {
+			height: auto;
+		}
+		.main-title-container .logos {
+			height: auto;
+		}
+		.main-title-container .main-title h1 {
+			position: relative;
+			top: auto;
+			font-size: 5em;
+		}
+		.topic {
+			min-height: 100px;
+			margin-bottom: 20px !important;
+		}
+		.speaker-photo img{
+			margin-left: 17px;
+			margin-bottom: 20px;
+		}		
+	}
