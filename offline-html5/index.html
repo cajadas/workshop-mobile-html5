@@ -1,0 +1,22 @@
+<!DOCTYPE html> 
+
+<html lang="en" dir="ltr" manifest="example.manifest"> 
+<head>
+  <meta charset="utf-8" />
+  <title>AppCache - Example</title>
+</head>
+
+<body>
+<a href="web_sql.html">Web SQL</a>
+<br>
+<a href="web_storage.html">Web Storage Example</a>
+<script type="text/javascript">
+if (window.applicationCache) {
+  applicationCache.addEventListener('updateready', function() {
+    if (confirm('An update is available. Reload now?'))
+      window.location.reload();
+  });
+}
+</script>  
+</body>
+</html>

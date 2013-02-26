@@ -1,0 +1,220 @@
+<!DOCTYPE html> 
+
+<html lang="en" dir="ltr" manifest="example.manifest"> 
+<head>
+  <meta charset="utf-8" />
+  <title>WebSQL - Example</title>
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="migrator.js"></script>
+  <link rel='stylesheet' href='style.css' type='text/css' media='all' />
+</head>
+
+<body>
+  <script>
+  $.fn.clearForm = function() {
+    return this.each(function() {
+      var type = this.type, tag = this.tagName.toLowerCase();
+      if (tag == 'form')
+      return $(':input',this).clearForm();
+      if (type == 'text' || type == 'password' || tag == 'textarea')
+      this.value = '';
+      else if (type == 'checkbox' || type == 'radio')
+      this.checked = false;
+      else if (tag == 'select')
+      this.selectedIndex = -1;
+    });
+  };
+
+  /**
+  * Se o openDatabase for criado sem nenhuma callback a executar uma transacção, então ele NÃO coloca versão na base de dados (até à primeria transacção)
+  * Se o changeVersion chamar a callback de erro porque a versão da base de dados não coincide, outro changeVersion a seguir dá o erro DATABASE_ERR. Para se contornar este problema tem de se voltar a fazer open da BD.
+  **/
+  var changeVersionError = function(err) {
+    var codeStrings = [
+    "UNKNOWN_ERR",
+    "DATABASE_ERR",
+    "VERSION_ERR",
+    "TOO_LARGE_ERR",
+    "QUOTA_ERR",
+    "SYNTAX_ERR",
+    "CONSTRAINT_ERR",
+    "TIMEOUT_ERR"
+    ];
+    console.log("ERROR: " + err.code + "; code string: " + codeStrings[err.code] + "; message: " + err.message);
+  }
+
+  var Byclosure = {}; 
+  Byclosure.webSQL = {};
+  Byclosure.webSQL.db = null;
+
+  Byclosure.webSQL.open = function () {
+    if(!window.openDatabase){
+      alert("Web SQL not supported.");
+      return;
+    } 
+
+    // Database openDatabase(in DOMString name, in DOMString version, in DOMString displayName, in unsigned long estimatedSize, in optional DatabaseCallback creationCallback);
+    // If the database version provided is not the empty string, and there is already a database with the given name from the origin origin, but the database has a different version than the version provided, then throw an INVALID_STATE_ERR exception and abort these steps.
+    var db = window.openDatabase("tasks_db", "", "Electronic Programming Guide 2", 1024*1024*2, function(db) {
+      window.console.log("Start running migrations from creation callback!");
+    });
+
+    // void changeVersion(in DOMString oldVersion, in DOMString newVersion, in optional SQLTransactionCallback callback, in optional SQLTransactionErrorCallback errorCallback, in optional SQLVoidCallback successCallback);
+    Byclosure.webSQL.db = db;
+    return db;
+  }
+
+  function refreshTaskList() {
+    getTasks(
+      function(tasks) {
+        var html = '<ul>';
+        for (var i=tasks.length-1; i >= 0; i--) {
+          html += "<li>" + tasks.item(i).name + " (" + tasks.item(i).difficulty + ")</li>"
+        }
+        html += '</ul>'
+        var list = $("#list");
+        list.children().remove();
+        list.append(html);
+      },
+      function(error) {
+        console.log("Error: " + error);
+      }
+    );
+  }
+
+  function getTasks(callback, errorCallback) {
+    Byclosure.webSQL.db.transaction(function(tx) {
+      tx.executeSql(
+        "SELECT * FROM tasks",
+        [],
+        function(tx2, dataSet) {
+          if (dataSet.rows) {
+            callback(dataSet.rows);
+          } else {
+            callback([]);
+          }
+        },
+        function(tx2, error) {
+          errorCallback(error);
+        }
+      );
+    });
+  }
+
+  function storeTask(name, difficulty, callback, errorCallback) {
+    Byclosure.webSQL.db.transaction(function(tx) {
+      tx.executeSql(
+        "INSERT INTO tasks (name, difficulty) VALUES (?,?)",
+        [name, difficulty],
+        function(tx2, dataSet) {
+          callback(dataSet.rows);
+        },
+        function(tx2, error) {
+          errorCallback(error);
+        }
+      );
+    });
+  }
+
+  $(document).ready(function() {
+    $(function() {
+      $("#form .save").click(function() {
+        var nameField = $("#form input[name='name']").get()[0];
+        var difficultyField = $("#form input[name='difficulty']").get()[0];
+
+        if ((nameField.value != '') && (difficultyField.value != '')) {
+          storeTask(nameField.value, difficultyField.value, function(tasks) {
+            refreshTaskList();
+            $('#form').clearForm();
+          });
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      $("#form .delete").click(function() {
+        var db = Byclosure.webSQL.db;
+        db.transaction(function(tx) {
+          tx.executeSql(
+            "DELETE FROM tasks",
+            [],
+            function(tx2, dataSet) {
+              console.log("Storage cleared...");
+            },
+            function(tx2, error) {
+              changeVersionError(error);
+            }
+          );
+        });
+
+        refreshTaskList();
+        return false;
+      });
+
+      $("#refresh").click(function() {
+        refreshTaskList();
+        return false;
+      });
+
+      var db = Byclosure.webSQL.open();
+
+      var M = new Migrator(db);
+      M.setDebugLevel(Migrator.DEBUG_HIGH);
+
+      M.migration(1, function(tx) {
+        tx.executeSql("CREATE TABLE 'tasks' (\
+          id INTEGER PRIMARY KEY,\
+          name TEXT,\
+          difficulty INTEGER);",
+          [],
+          function(tx2, dataSet) {
+            console.log("Migration 1 executed SQL correctly!");
+          },
+          function(tx2, error) {
+            changeVersionError(error);
+          }
+        );
+      });
+
+      M.execute();
+      
+      M.whenDone(function() {
+        console.log("database version: " + db.version);
+        refreshTaskList();
+      });
+    });
+  });  
+  </script>
+  <h1>Task List</h1>
+  <h2>New Task</h2>
+  <form id="form">
+    <fieldset>
+      <legend>Details</legend>
+      <ol>
+        <li>
+          <label for="name">Name</label>
+          <input name="name" type="text" placeholder="Task name" required>
+        </li>
+
+        <li>
+          <label for="name">Difficulty</label>
+          <input name="difficulty" type="range" min="0" max="10" step="2" value="5" required>
+        </li>
+      </ol>
+    </fieldset>
+    <fieldset>
+      <button class="save" type="submit">Save</button>
+      <button class="delete" type="submit">Clear Tasks</button>
+      <div id="actions">
+        <div id="refresh">Refresh</div>
+      </div>
+    </fieldset>
+  </form>
+
+  <h2>All Tasks</h2>
+  <div id="list" />
+</body>
+
+
+</html>

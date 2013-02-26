@@ -1,0 +1,127 @@
+<!DOCTYPE html> 
+
+<html lang="en" dir="ltr" manifest="example.manifest"> 
+<head>
+  <meta charset="utf-8" />
+  <title>Web Storage - Example</title>
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="migrator.js"></script>
+  <link rel='stylesheet' href='style.css' type='text/css' media='all' />
+</head>
+
+<body>
+  <script>
+  $.fn.clearForm = function() {
+    return this.each(function() {
+      var type = this.type, tag = this.tagName.toLowerCase();
+      if (tag == 'form')
+      return $(':input',this).clearForm();
+      if (type == 'text' || type == 'password' || tag == 'textarea')
+      this.value = '';
+      else if (type == 'checkbox' || type == 'radio')
+      this.checked = false;
+      else if (tag == 'select')
+      this.selectedIndex = -1;
+    });
+  };
+
+  window.myStorage = localStorage;
+
+  function refreshTaskList() {
+    console.log("Refreshing task list");
+    var tasks = getTasks();
+    var html = '<ul>';
+    var i;
+    for (i=tasks.length-1; i >= 0; i--) {
+      html += "<li>" + tasks[i].name + " (" + tasks[i].difficulty + ")</li>"
+    }
+    html += '</ul>'
+    var list = $("#list");
+    list.children().remove();
+    list.append(html);
+  }
+
+  function getTasks() {
+    var serializedTasks = myStorage.getItem("tasks");
+    if (serializedTasks == null) {
+      return [];
+    } else {
+      return JSON.parse(serializedTasks);
+    } 
+  }
+
+  function storeTask(name, difficulty) {
+    var tasks = getTasks();
+    myStorage.setItem("tasks", JSON.stringify(tasks.concat({"name": name, "difficulty": difficulty})));
+  }
+
+  $(document).ready(function() {
+    $(function() {
+      $("#form .save").click(function() {
+        var nameField = $("#form input[name='name']").get()[0];
+        var difficultyField = $("#form input[name='difficulty']").get()[0];
+
+        if ((nameField.value != '') && (difficultyField.value != '')) {
+          storeTask(nameField.value, difficultyField.value);
+          refreshTaskList();
+          $('#form').clearForm();
+          return false;
+        } else {
+          return true;
+        }
+      });
+
+      $("#form .delete").click(function() {
+        myStorage.clear();
+        console.log("Storage cleared...");
+        refreshTaskList();
+        return false;
+      });
+
+      $("#refresh").click(function() {
+        refreshTaskList();
+        return false;
+      });
+
+      /* Bind do evento de storage */
+      $(window).bind('storage', function(e) {
+        console.log("Storage Event!");
+        refreshTaskList();
+      }, false);
+
+      refreshTaskList();
+    });
+  });
+    </script>
+
+    <h1>Task List</h1>
+    <h2>New Task</h2>
+    <form id="form">
+      <fieldset>
+        <legend>Details</legend>
+        <ol>
+          <li>
+            <label for="name">Name</label>
+            <input name="name" type="text" placeholder="Task name" required>
+          </li>
+
+          <li>
+            <label for="name">Difficulty</label>
+            <input name="difficulty" type="range" min="0" max="10" step="2" value="5" required>
+          </li>
+        </ol>
+      </fieldset>
+      <fieldset>
+        <button class="save" type="submit">Save</button>
+        <button class="delete" type="submit">Clear Tasks</button>
+        <div id="actions">
+          <div id="refresh">Refresh</div>
+        </div>
+      </fieldset>
+    </form>
+    
+
+    <h2>All Tasks</h2>
+    <div id="list" />
+  </body>
+</html>
