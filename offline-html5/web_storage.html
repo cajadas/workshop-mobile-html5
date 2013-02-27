@@ -25,7 +25,18 @@
     });
   };
 
-  window.myStorage = localStorage;
+  if (supportsLocalStorage) {
+    window.myStorage = localStorage;
+  }
+
+  function supportsLocalStorage() {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } 
+    catch (e) {
+      return false;
+    }
+  }
 
   function refreshTaskList() {
     console.log("Refreshing task list");
