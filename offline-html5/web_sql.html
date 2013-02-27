@@ -55,7 +55,7 @@
 
     // Database openDatabase(in DOMString name, in DOMString version, in DOMString displayName, in unsigned long estimatedSize, in optional DatabaseCallback creationCallback);
     // If the database version provided is not the empty string, and there is already a database with the given name from the origin origin, but the database has a different version than the version provided, then throw an INVALID_STATE_ERR exception and abort these steps.
-    var db = window.openDatabase("tasks_db", "", "Electronic Programming Guide 2", 1024*1024*2, function(db) {
+    var db = window.openDatabase("tasks_db", "", "TASK DB", 1024*1024*2, function(db) {
       window.console.log("Start running migrations from creation callback!");
     });
 
@@ -83,37 +83,11 @@
   }
 
   function getTasks(callback, errorCallback) {
-    Byclosure.webSQL.db.transaction(function(tx) {
-      tx.executeSql(
-        "SELECT * FROM tasks",
-        [],
-        function(tx2, dataSet) {
-          if (dataSet.rows) {
-            callback(dataSet.rows);
-          } else {
-            callback([]);
-          }
-        },
-        function(tx2, error) {
-          errorCallback(error);
-        }
-      );
-    });
+    /* YOUR CODE HERE */
   }
 
   function storeTask(name, difficulty, callback, errorCallback) {
-    Byclosure.webSQL.db.transaction(function(tx) {
-      tx.executeSql(
-        "INSERT INTO tasks (name, difficulty) VALUES (?,?)",
-        [name, difficulty],
-        function(tx2, dataSet) {
-          callback(dataSet.rows);
-        },
-        function(tx2, error) {
-          errorCallback(error);
-        }
-      );
-    });
+    /* YOUR CODE HERE */
   }
 
   $(document).ready(function() {
