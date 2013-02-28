@@ -1,6 +1,6 @@
 <!DOCTYPE html> 
 
-<html lang="en" dir="ltr" manifest="example.manifest"> 
+<html lang="en" dir="ltr"> 
 <head>
   <meta charset="utf-8" />
   <title>WebSQL - Example</title>
@@ -83,11 +83,37 @@
   }
 
   function getTasks(callback, errorCallback) {
-    /* YOUR CODE HERE */
+    Byclosure.webSQL.db.transaction(function(tx) {
+      tx.executeSql(
+        "SELECT * FROM tasks",
+        [],
+        function(tx2, dataSet) {
+          if (dataSet.rows) {
+            callback(dataSet.rows);
+          } else {
+            callback([]);
+          }
+        },
+        function(tx2, error) {
+          errorCallback(error);
+        }
+      );
+    });
   }
 
   function storeTask(name, difficulty, callback, errorCallback) {
-    /* YOUR CODE HERE */
+    Byclosure.webSQL.db.transaction(function(tx) {
+      tx.executeSql(
+        "INSERT INTO tasks (name, difficulty) VALUES (?,?)",
+        [name, difficulty],
+        function(tx2, dataSet) {
+          callback(dataSet.rows);
+        },
+        function(tx2, error) {
+          errorCallback(error);
+        }
+      );
+    });
   }
 
   $(document).ready(function() {
