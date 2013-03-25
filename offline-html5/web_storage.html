@@ -40,30 +40,38 @@
 
   function refreshTaskList() {
     console.log("Refreshing task list");
-    var tasks = getTasks();
+    var taskCounter = getTaskCounter();
     var html = '<ul>';
     var i;
-    for (i=tasks.length-1; i >= 0; i--) {
-      html += "<li>" + tasks[i].name + " (" + tasks[i].difficulty + ")</li>"
+    for (i=0; i < taskCounter; i++) {
+      html += "<li>" + getTask(i).name + " (" + getTask(i).difficulty + ")</li>"
     }
     html += '</ul>'
     var list = $("#list");
     list.children().remove();
     list.append(html);
+
+    console.log("TaskCounter: " + taskCounter);
   }
 
-  function getTasks() {
-    var serializedTasks = myStorage.getItem("tasks");
-    if (serializedTasks == null) {
-      return [];
+  function getTask(index) {
+    return JSON.parse(myStorage.getItem("task-" + index));
+  }
+
+  function getTaskCounter() {
+    var taskCounter = myStorage.getItem("taskCounter");
+    if (taskCounter == null) {
+      return 0;
     } else {
-      return JSON.parse(serializedTasks);
+      return parseInt(taskCounter);
     } 
   }
 
   function storeTask(name, difficulty) {
-    var tasks = getTasks();
-    myStorage.setItem("tasks", JSON.stringify(tasks.concat({"name": name, "difficulty": difficulty})));
+    var taskCounter = getTaskCounter();
+    myStorage.setItem("task-" + taskCounter, JSON.stringify({"name": name, "difficulty": difficulty}));
+
+    myStorage.setItem("taskCounter", getTaskCounter() + 1);
   }
 
   $(document).ready(function() {
